@@ -4,5 +4,21 @@ __pycache__/
 venv/
 .env
 *.png
+*.jpg
+*.jpeg
 *.pdf
 .pytest_cache/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+
+# uv
+uv.lock
+.python-version
+
