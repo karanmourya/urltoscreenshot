@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: pixforge
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: PIXFORGE_API_KEY
+        generateValue: true
+      - key: PIXFORGE_RATE_LIMIT
+        value: "10"
+      - key: PIXFORGE_CONCURRENCY
+        value: "1"
+      - key: PIXFORGE_WIDTH
+        value: "1280"
+      - key: PIXFORGE_HEIGHT
+        value: "720"
+      - key: PIXFORGE_TYPE
+        value: "jpeg"
+      - key: PIXFORGE_QUALITY
+        value: "80"
+      - key: PIXFORGE_TIMEOUT_MS
+        value: "10000"
