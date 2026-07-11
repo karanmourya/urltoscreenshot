@@ -21,20 +21,24 @@ class AuthError(Exception):
     """Raised when no valid auth credential is supplied."""
 
 
-async def require_auth(
-    request: Request,
-    x_rapidapi_proxy_secret: Optional[str] = Header(None),
-    authorization: Optional[str] = Header(None),
-):
+async def require_auth(request: Request):
     """Accept RapidAPI proxy-secret, admin Bearer key, or issued job Bearer token.
 
     Returns the caller key used for rate-limiting. Raises AuthError if none valid.
 
+    Headers are read directly from request.headers so this works whether called as a
+    FastAPI dependency or directly from the rate-limit middleware (which passes only
+    the Request object). Using the Header() default would leave a Header object behind
+    on the direct call and crash with AttributeError.
+
     When RAPIDAPI_PROXY_SECRET is configured, every request must carry the matching
     X-RapidAPI-Proxy-Secret header (RapidAPI injects this on proxied traffic only),
-    which proves the request originated from RapidAPI infrastructure. Direct/private
-    calls use Authorization: Bearer <PIXFORGE_API_KEY> instead.
+    proving the request originated from RapidAPI infrastructure. Direct/private calls
+    use Authorization: Bearer <PIXFORGE_API_KEY> instead.
     """
+    authorization = request.headers.get("authorization")
+    x_rapidapi_proxy_secret = request.headers.get("x-rapidapi-proxy-secret")
+
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ", 1)[1].strip()
         if config.ADMIN_API_KEY and token == config.ADMIN_API_KEY:
