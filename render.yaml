@@ -21,3 +21,5 @@ services:
         value: "80"
       - key: PIXFORGE_TIMEOUT_MS
         value: "10000"
+      - key: PIXFORGE_DEBUG
+        value: "true"
