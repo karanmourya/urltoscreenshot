@@ -23,15 +23,18 @@ class AuthError(Exception):
 
 async def require_auth(
     request: Request,
-    x_rapidapi_key: Optional[str] = Header(None),
+    x_rapidapi_proxy_secret: Optional[str] = Header(None),
     authorization: Optional[str] = Header(None),
 ):
-    """Accept RapidAPI key, admin Bearer key, or job access_token Bearer.
+    """Accept RapidAPI proxy-secret, admin Bearer key, or issued job Bearer token.
 
     Returns the caller key used for rate-limiting. Raises AuthError if none valid.
+
+    When RAPIDAPI_PROXY_SECRET is configured, every request must carry the matching
+    X-RapidAPI-Proxy-Secret header (RapidAPI injects this on proxied traffic only),
+    which proves the request originated from RapidAPI infrastructure. Direct/private
+    calls use Authorization: Bearer <PIXFORGE_API_KEY> instead.
     """
-    if x_rapidapi_key:
-        return x_rapidapi_key
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ", 1)[1].strip()
         if config.ADMIN_API_KEY and token == config.ADMIN_API_KEY:
@@ -42,6 +45,16 @@ async def require_auth(
             request.state.job_token = token
             return f"job:{token}"
         raise AuthError()
+
+    # When PIXFORGE_RAPIDAPI_PROXY_SECRET is set, every non-admin request MUST carry
+    # the matching X-RapidAPI-Proxy-Secret header (RapidAPI injects it on proxied
+    # traffic only), proving the request originated from RapidAPI infrastructure.
+    # This blocks anyone calling the public origin URL directly.
+    if config.RAPIDAPI_PROXY_SECRET:
+        if x_rapidapi_proxy_secret != config.RAPIDAPI_PROXY_SECRET:
+            raise AuthError()
+        return x_rapidapi_proxy_secret
+
     if config.ADMIN_API_KEY and authorization and authorization == config.ADMIN_API_KEY:
         return config.ADMIN_API_KEY
     raise AuthError()

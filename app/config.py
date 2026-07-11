@@ -10,6 +10,10 @@ ADMIN_API_KEY = os.getenv("PIXFORGE_API_KEY", "")
 # Rate limit: requests per minute, per caller key.
 RATE_LIMIT_PER_MINUTE = int(os.getenv("PIXFORGE_RATE_LIMIT", "10"))
 
+# When set, requests carrying X-RapidAPI-Proxy-Secret equal to this value are
+# accepted as coming from the RapidAPI proxy (proves origin = RapidAPI infra).
+RAPIDAPI_PROXY_SECRET = os.getenv("PIXFORGE_RAPIDAPI_PROXY_SECRET", "")
+
 # Concurrency: at most N simultaneous screenshots (Render free has ~512MB RAM).
 MAX_CONCURRENCY = int(os.getenv("PIXFORGE_CONCURRENCY", "1"))
 
