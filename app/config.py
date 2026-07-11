@@ -10,6 +10,10 @@ ADMIN_API_KEY = os.getenv("PIXFORGE_API_KEY", "")
 # Rate limit: requests per minute, per caller key.
 RATE_LIMIT_PER_MINUTE = int(os.getenv("PIXFORGE_RATE_LIMIT", "10"))
 
+# Debug mode: include the real exception message in 500 responses (dev only).
+# Never enable in production-facing deployments — it can leak internal details.
+DEBUG = os.getenv("PIXFORGE_DEBUG", "").lower() in ("1", "true", "yes")
+
 # When set, requests carrying X-RapidAPI-Proxy-Secret equal to this value are
 # accepted as coming from the RapidAPI proxy (proves origin = RapidAPI infra).
 RAPIDAPI_PROXY_SECRET = os.getenv("PIXFORGE_RAPIDAPI_PROXY_SECRET", "")

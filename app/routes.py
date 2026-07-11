@@ -122,7 +122,8 @@ async def screenshot_image(
         return errors.bad_request(str(e), {"param": "options", "reason": str(e)})
     except Exception as e:
         logger.exception("capture failed")
-        return errors.server_error()
+        detail = {"error": str(e)} if config.DEBUG else None
+        return errors.server_error(details=detail)
     return Response(content=data, media_type=media_type)
 
 
@@ -154,9 +155,10 @@ async def screenshot_json(
         result = await screenshot.capture_to_result(opts)
     except ValueError as e:
         return errors.bad_request(str(e), {"param": "options", "reason": str(e)})
-    except Exception:
+    except Exception as e:
         logger.exception("capture failed")
-        return errors.server_error()
+        detail = {"error": str(e)} if config.DEBUG else None
+        return errors.server_error(details=detail)
     return JSONResponse(result)
 
 
@@ -187,9 +189,10 @@ async def pdf_route(
             data = await _render_pdf(browser_mod.get_browser(), opts)
     except ValueError as e:
         return errors.bad_request(str(e), {"param": "options"})
-    except Exception:
+    except Exception as e:
         logger.exception("pdf failed")
-        return errors.server_error()
+        detail = {"error": str(e)} if config.DEBUG else None
+        return errors.server_error(details=detail)
     return Response(content=data, media_type="application/pdf")
 
 

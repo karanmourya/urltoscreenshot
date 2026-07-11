@@ -21,8 +21,8 @@ def not_found(message: str):
     return error_response(404, message)
 
 
-def server_error(message: str = "Internal server error."):
-    return error_response(500, message)
+def server_error(message: str = "Internal server error.", details: dict | None = None):
+    return error_response(500, message, details)
 
 
 def unavailable(message: str = "Service temporarily unavailable. Retry later."):
