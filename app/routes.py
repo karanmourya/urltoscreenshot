@@ -33,12 +33,15 @@ async def require_auth(
     if x_rapidapi_key:
         return x_rapidapi_key
     if authorization and authorization.startswith("Bearer "):
-        token = authorization.split(" ", 1)[1]
+        token = authorization.split(" ", 1)[1].strip()
         if config.ADMIN_API_KEY and token == config.ADMIN_API_KEY:
             return config.ADMIN_API_KEY
-        # Anonymous job token; downstream job endpoint validates it.
-        request.state.job_token = token
-        return f"job:{token}"
+        # Only accept a Bearer token the service itself issued (anonymous job token);
+        # any other Bearer value is rejected so the endpoint is not open to anyone.
+        if token and jobs.get_job_by_token(token):
+            request.state.job_token = token
+            return f"job:{token}"
+        raise AuthError()
     if config.ADMIN_API_KEY and authorization and authorization == config.ADMIN_API_KEY:
         return config.ADMIN_API_KEY
     raise AuthError()

@@ -63,6 +63,21 @@ def get_job(job_id: str) -> Job | None:
     return job
 
 
+def get_job_by_token(access_token: str) -> Job | None:
+    """Find a live (non-expired) job by its access_token.
+
+    Used by require_auth to validate anonymous Bearer job tokens, so that
+    only tokens the service actually issued are accepted.
+    """
+    for job in _STORE.values():
+        if job.access_token == access_token:
+            if _now() - job.created_at > JOB_TTL:
+                _STORE.pop(job.job_id, None)
+                return None
+            return job
+    return None
+
+
 def public_view(job: Job) -> dict:
     return {
         "job_id": job.job_id,
