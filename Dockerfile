@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:chromium-v1.49.1-noble
+FROM mcr.microsoft.com/playwright/python:v1.49.1-noble
 
 WORKDIR /app
 
